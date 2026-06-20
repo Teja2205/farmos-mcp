@@ -27,5 +27,13 @@ def get_pest_alerts(crop: str, state: str) -> dict:
         "common_pests": alerts,
         "recommendation": f"Monitor your {crop} plants in {state} for these common pests"
     }
+    
+@mcp.tool()
+def get_soil_data(lat: float, lon: float)-> dict:
+    """ Get common soil data for the crop in us state """
+    url = f"https://rest.isric.org/soilgrids/v2.0/properties/query?lon={lon}&lat={lat}&property=phh2o&property=soc&depth=0-5cm&value=mean"
+    soil_data =  httpx.get(url , timeout=30.0)
+    return soil_data.json()
+    
 if __name__ == "__main__":
     mcp.run()
