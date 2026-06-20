@@ -34,6 +34,15 @@ def get_soil_data(lat: float, lon: float)-> dict:
     url = f"https://rest.isric.org/soilgrids/v2.0/properties/query?lon={lon}&lat={lat}&property=phh2o&property=soc&depth=0-5cm&value=mean"
     soil_data =  httpx.get(url , timeout=30.0)
     return soil_data.json()
-    
+
+@mcp.tool()
+def get_field_context(lat: float, lon: float, crop: str, state: str) -> dict:
+    """Bundle weather, pest alerts, and soil data into one field context."""
+    complete_data ={}
+    weather_data = get_weather(lat , lon , days = 7)
+    pests_data = get_pest_alerts(crop , state)
+    soildata = get_soil_data(lat, lon)
+    complete_data  = weather_data | pests_data | soildata
+    return complete_data
 if __name__ == "__main__":
     mcp.run()
